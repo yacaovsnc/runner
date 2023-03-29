@@ -49,6 +49,8 @@ namespace GitHub.Runner.Worker
                 VssCredentials jobServerCredential = VssUtil.GetVssCredential(systemConnection);
                 await runServer.ConnectAsync(systemConnection.Url, jobServerCredential);
                 server = runServer;
+
+                _jobServerQueue.Start(message, enableActionsUpload: false);
             }
             else
             {
@@ -63,7 +65,7 @@ namespace GitHub.Runner.Worker
                 VssConnection jobConnection = VssUtil.CreateConnection(jobServerUrl, jobServerCredential, new DelegatingHandler[] { new ThrottlingReportHandler(_jobServerQueue) });
                 await jobServer.ConnectAsync(jobConnection);
 
-                _jobServerQueue.Start(message);
+                _jobServerQueue.Start(message, enableActionsUpload: true);
                 server = jobServer;
             }
 
